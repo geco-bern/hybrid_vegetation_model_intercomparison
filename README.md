@@ -1,94 +1,17 @@
-# The GECO R project template
+# Hybrid Vegetation Model Intercomparison
 
-This is a github template for a GECO R project repository. This template can
-be loaded when creating a new project in github. As such you pre-populate a
-project with a standard set of directories. This ensures a project-oriented 
-and consistent workflow across all lab members, and removes some of the mental
-overhead in making decisions on a project structure.
+## Project Aim and Description
 
-It must be noted that some of the functionality as provided by this setup is
-included in the [`usethis`](https://usethis.r-lib.org/) R package, the aim is 
-slightly different. For one, `usethis` is aimed at populating a package structure.
-Second, there is not preset full template, hence many individual decisions still
-need to be made and code executed. This is bypassed by this setup.
+TBD
 
-## Use
-
-### A github project from the template
-
-To use the template create a new repository on github, as you otherwise would
-using the big green button. If you are in the project on github you can hit
-the green button top right (Use this template).
-
-![](https://github.com/bluegreen-labs/environmental_data_science_101/raw/main/images/green_button.png)
-
-Otherwise you can select the repository from the template dropdown menu, select `geco-bern/R-project-template`.
-
-![](https://github.com/bluegreen-labs/environmental_data_science_101/raw/main/images/new_repo_1.png)
-
-Proceed as usual by naming your repository. However, be careful to select the 
-correct owner of the project if you have multiple identities.
-![](https://github.com/bluegreen-labs/environmental_data_science_101/raw/main/images/new_repo_2.png)
-
-### Clone to your local computer
-
-The new repository will be created and populated with the files of the template.
-You can then clone the project to your local computer to add files.
-
-Although optional it is wise to rename the `*.Proj` file as this will not
-automatically change to your repository name. However, retaining the original
-name should not change any of the functionality.
-
-```bash
-git clone git@github.com:USER/YOUR_PROJECT.git
-```
-
-## Structure
-
-The structure of the template follows the structure of an R package without
-actually being one. There are several reasons for this.
-
-- Familiarizes you with an R package structure
-  - allowing for an optional switch to an R package
-- Avoids top level aggregation of data, code and reporting files
-- Splits the dynamic reporting from academic writing (`vignettes` vs. `manuscript`)
-- Splits pre-processing of data from working / included data (`data-raw` vs. `data`)
-- Splits R code from other scripts (bash / python in `src`)
-- Splits R functions from R analysis scripts (`R` vs `analysis`)
-
-Below you find a comprehensive list of what goes where an why, as well as some
-best practices on how to structure further data within these folders.
+## Project Structure
 
 ### The R folder
 
-The `R` folder contains R functions, not scripts. This means code wrapped in a
-structure as such
-
-```R
-# A demo function
-#
-# This function demonstrates the general layout
-# of a function
-
-my_function <- function(parameter) {
-  some_actions
-}
-```
+The `R` folder contains R functions, not scripts. 
 
 Functions are actions you need more than once, which can not be generated
 easily with external packages and are tailored to your project.
-
-These functions should stand on their own with limited links to additional
-custom functions. Ideally you provide a brief title and description on the 
-function's purpose before.
-
-Writing functions seems an initial waste of time, you could easily just copy and
-paste some code in your analysis scripts. However, this means that if you
-decide certain aspects of this workflow you might have to hunt down these
-changes in all analysis scripts. Failing to do so will result in corrupted 
-analysis. In addition, writing functions will make it easy to re-use the code
-within the context of a new project, and if proven to be generally useful
-outside a single research project it can be integrated in a formal package.
 
 ### The src folder
 
@@ -181,40 +104,6 @@ analysis/
 
 Output of the analysis routines can be written to file (`manuscript` folder) or
 visualized on the console or plot viewer panel.
-
-### The vignettes folder
-
-The `vignettes` folder contains dynamic notebooks, i.e. R markdown files. These
-might serve a dual use between analysis and manuscript. However, the use case
-in reality should be considered very narrowly. In general, as they are commonly
-used, R markdown files are rarely portable. The argument that it is easy to 
-share rendered html files is invalid if you adhere to an open workflow with
-github based snapshots. The latter ensures that all code is visible, all data
-is visible, and the project is truly reproducible. Furthermore, R markdown
-documents mix two cognitive tasks, writing text and writing code. Switching
-between these two modes comes with undue overhead. If you code, you should not
-be writing prose, and vise versa.
-
-Unless applied to small, educational, examples a markdown file has little place
-in a code heavy environment. In short, if your R markdown file contains more 
-code than it does text, it should be considered an R script or function 
-(with comments or documentation). Conversely, if your markdown file contains
-more text than code it probably is easier to collaborate on a true word 
-processing file (or a Google Docs file). The use case where the notebooks might
-serve some importance is true reporting of general statistics.
-
-Finally, the use of R markdown also encourages bad project management practices.
-Most commonly this originates from the fact that rendering of the document is
-relative to the location of the document itself. If no session management tools
-such as the package [`here`](https://here.r-lib.org/) are used this automatically
-causes files to pile up in the top most level of a project, undoing most efforts
-to structure data and code. This is further compounded by the fact that there is
-a tendency to remain within the working environment (document), and therefore 
-code blocks which should be functions are not translated as such.
-
-In short, R markdown files have their function in reporting results, once
-generated (through functions or analysis scripts) but should be avoided to
-develop code / ideas (see cognitive switching remark)!
 
 ### Capturing your session state
 
