@@ -4,6 +4,9 @@
 
 TBD
 
+To reproduce prepare data with scripts in `data-raw` followed by running
+`analysis/run_SITES.R`.
+
 ## Project Structure
 
 ### The R folder
