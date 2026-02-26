@@ -2,7 +2,7 @@
 #       adapted in the following. Main changes are due to:
 #       - [x] deriving fapar directly from LAI
 #       - [x] adding argument ccov, allowing to provide cloud cover data frame
-#       - [ ] TODO: not requiring a subfolder 'fluxnet'
+#       - [x] not requiring a subfolder 'fluxnet'
 
 
 
@@ -63,7 +63,7 @@ my_fdk_format_drivers <- function(
   list_flux <- lapply(site_info$sitename, function(site){
 
     # get file name path
-    filn <- list.files(paste0(path, "/fluxnet/"),
+    filn <- list.files(path, # NOTE: removed here hardcoded subfolder 'fluxnet'
                        pattern = paste0("FLX_", site, ".*_FULLSET_DD.*.csv"),
                        recursive = TRUE,
                        full.names = TRUE

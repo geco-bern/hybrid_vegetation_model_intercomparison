@@ -6,12 +6,6 @@
 # '../data/rsofun_drivers_LEMONTREE_SITES_1.csv' and
 # '../data/rsofun_drivers_LEMONTREE_SITES_2.csv'
 
-
-####   1.2 Models inputs: /rds/general/project/lemontree/live/source/inter_compar_HB/SITES/FLUXDATAKIT/hourly_inputs_with_LAI
-####   - LAI from sentinel 2 (available from 20/19 onwards)
-####   - climate from in situ measurement
-####   - soil moisture from SPLASH (available on demand)
-
 library(readr)
 library(tidyverse)
 library(lubridate)
@@ -54,7 +48,7 @@ input_file_ccov <- here::here("data/ccov_LEMONTREE_SITES.csv")
 input_dir_hourly <- here::here("data-raw/SITES/FLUXDATAKIT/hourly_inputs_with_LAI")
 FluxDataKit::fdk_site_info
 
-output_dir_DD <- here::here("data/INPUTS_DD/fluxnet") # NOTE: because of hardcoding in FluxDataKit::fdk_format_drivers a subfolder fluxnet is required
+output_dir_DD <- here::here("data/INPUTS_DD")
 dir.create(output_dir_DD, recursive = TRUE, showWarnings = FALSE)
 
 output_file_drivers <- here::here("data/rsofun_drivers_LEMONTREE_SITES.csv")
@@ -139,7 +133,7 @@ driver_data <- my_fdk_format_drivers(
   site_info = FluxDataKit::fdk_site_info |>
     dplyr::filter(sitename %in% LEMONTREE_SITES_hourly_df$sitename),
   params_siml = params_siml,
-  path = gsub("/fluxnet$","",output_dir_DD), # NOTE: because of hardcoding inside FluxDataKit a subfolder 'fluxnet' is added
+  path = output_dir_DD,
   ccov = ccov_df |> select(-source),
   verbose = TRUE
 )
