@@ -37,3 +37,7 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# Do not track result files
+data/rsofun_results_*.csv
+data/rsofun_raw_results_*.csv

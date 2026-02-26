@@ -96,13 +96,13 @@ invalid_drivers <- drivers |>
 
 
 # run model
-df_output <- runread_pmodel_f(
+df_result <- runread_pmodel_f(
   valid_drivers,
   par = params_modl,
   makecheck = TRUE,
   parallel = FALSE
 )
-df_output |> select(-site_info) |> unnest(data) |>
+df_result |> select(-site_info) |> unnest(data) |>
   readr::write_csv(here::here("data/rsofun_raw_results_LEMONTREE_SITES.csv"))
 
 
@@ -111,7 +111,7 @@ df_output |> select(-site_info) |> unnest(data) |>
 # TODO: fix bug. Error when trying to simulate sites with incomplete years instead of warning() and returning NA.
 # debug(runread_pmodel_f)
 # debug(run_pmodel_f_bysite)
-# df_output <- runread_pmodel_f(
+# df_result <- runread_pmodel_f(
 #   invalid_drivers,
 #   par = params_modl,
 #   makecheck = TRUE,
@@ -134,18 +134,88 @@ df_output |> select(-site_info) |> unnest(data) |>
   # vcmax25       hourly    umol/s/m2              Maximum rate of carboxylation in a leaf at 25degC
   # jmax25        hourly    umol/s/m2              Maximum electron transport rates at 25degC
 
-df_output |> select(-site_info) |> unnest(data) |>
-  # TODO: ensure units correspond to required output
+
+# Unit transformation
+M_C_g_mol   = 12 # g/mol
+M_H2O_g_mol = 18 # g/mol
+g_kg = 1000      # g/kg
+
+df_output <- df_result |> select(-site_info) |> unnest(data) |>
+  mutate(sitename = sitename,
+         date     = date,
+         gpp_umolCm2s            = gpp / 86400 / M_C_g_mol * 10^6,
+                                            # NOTE: from gC/m2/d to umolC/m2/s
+         evsp_umolH2Om2s         = NA,      # NOTE: from mm/d == kg/m2/d to umolH2O/m2/s
+         trans_umolH2Om2s        = NA,      # NOTE: from mm/d == kg/m2/d to umolH2O/m2/s
+         evapotrans_umolH2Om2s   = aet / 86400 * g_kg / M_H2O_g_mol * 10^6,
+                                            # NOTE: from mm/d == kg/m2/d to umolH2O/m2/s
+         mrso_kgm2        = wcont,          # NOTE: mm == kg/m2
+         chi__            = chi,
+         vcmax25_umolCm2s = vcmax25*10^6,   # NOTE: from molC/m2/s to umolC/m2/s
+         jmax25_umolCm2s  = jmax25*10^6) |> # NOTE: from molC/m2/s to umolC/m2/s
   select(sitename,
          date,
-         gpp_UNIT         = gpp,
-         evsp_UNIT        = aet,
-         trans_UNIT       = aet,
-         evapotrans_UNIT  = aet,
-         mrso_UNIT        = wcont,
-         chi__            = chi,
-         vcmax25_UNIT     = vcmax25,
-         jmax25_UNIT      = jmax25)
+         gpp_umolCm2s,
+         evsp_umolH2Om2s,
+         trans_umolH2Om2s,
+         evapotrans_umolH2Om2s,
+         mrso_kgm2,
+         chi__,
+         vcmax25_umolCm2s,
+         jmax25_umolCm2s)
 
-#TODO: save as CSV and upload
+# save as CSV and upload manually
 # NOTE: do we need to append again 29 Feb of leap years ??
+
+# # combined csv:
+# readr::write_csv(
+#   df_output,
+#   here::here("data/rsofun_results_LEMONTREE_SITES.csv"))
+
+# per-site csv:
+df_output |>
+  group_split(sitename) %>%
+  purrr::map(.f = function(subdf){
+    readr::write_csv(
+      x = subdf,
+      file = here::here(paste0("data/rsofun_results_",first(subdf$sitename),".csv")))
+  })
+
+
+
+# NOTE: our rsofun outputs are reduced in temporal extent
+#       because our code requires complete years
+dplyr::full_join(
+  df_output |> group_by(sitename) |> summarise(days_simulated = n()),
+  drivers |> group_by(sitename) |> summarise(days_requested = purrr::map(forcing, nrow) |> unlist())
+) |> print(n=26)
+  # # A tibble: 26 × 3
+  #    sitename days_simulated days_requested
+  #    <chr>             <int>          <int>
+  #  1 BE-Bra              730            730
+  #  2 BE-Lon              730            730
+  #  3 BE-Vie              730            730
+  #  4 CH-Cha              730            730
+  #  5 CH-Fru              730            730
+  #  6 CH-Lae              365            719    xxx reduced
+  #  7 CH-Oe2              730            730
+  #  8 CZ-BK1              365            726    xxx reduced
+  #  9 DE-Geb              730            730
+  # 10 DE-Gri              365            372    xxx reduced
+  # 11 DE-Hai              365            722    xxx reduced
+  # 12 DE-Kli              730            730
+  # 13 DE-Obe              730            730
+  # 14 DE-Tha              365            704    xxx reduced
+  # 15 FI-Let              730            730
+  # 16 GF-Guy              365            725    xxx reduced
+  # 17 IT-BCi              730            730
+  # 18 IT-Lav              730            730
+  # 19 IT-SR2              730            730
+  # 20 US-GLE              365            639    xxx reduced
+  # 21 US-Ha1              730            730
+  # 22 US-MMS              730            730
+  # 23 US-Ne1              730            730
+  # 24 US-UMd             1095           1095
+  # 25 US-Var              730           1029    xxx reduced
+  # 26 US-Wkg             1095           1095
+
