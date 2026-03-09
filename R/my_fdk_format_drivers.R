@@ -53,12 +53,6 @@ my_fdk_format_drivers <- function(
 
   #---- start-up checks ----
 
-  geco_system <- ifelse(
-    Sys.info()['nodename'] == "balder" | Sys.info()['nodename'] == "dash",
-    TRUE,
-    FALSE
-  )
-
   # check format of the site_info
   list_flux <- lapply(site_info$sitename, function(site){
 
@@ -129,8 +123,11 @@ my_fdk_format_drivers <- function(
         gpp_qc = NEE_VUT_REF_QC,
 
         # energy balance-corrected latent heat flux (~ evapotranspiration)
-        le = LE_CORR,
-        le_qc = LE_F_MDS_QC,
+        #le = LE_CORR,
+        #le_qc = LE_F_MDS_QC,
+        # latent heat flux (~ evapotranspiration)
+        le = LE_F_MDS,       # NOTE: modified from FDK
+        le_qc = LE_F_MDS_QC, # NOTE
 
         # net ecosystem exchange
         nee = NEE_VUT_REF,

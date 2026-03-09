@@ -69,18 +69,17 @@ drivers <- drivers |>
 
 # run model ----
 params_modl <- list(
-
-  # TODO: overwrite with Paredes et al...:
-
-  kphio              = 0.04998, # setup ORG in Stocker et al. 2020 GMD
-  kphio_par_a        = 0.01,  # set to zero to disable temperature-dependence of kphio, setup ORG in Stocker et al. 2020 GMD
-  kphio_par_b        = 1.0,
-  soilm_thetastar    = 0.6 * 240,  # to recover old setup with soil moisture stress
-  soilm_betao        = 0.01,
-  beta_unitcostratio = 146.0,
-  rd_to_vcmax        = 0.014, # value from Atkin et al. 2015 for C3 herbaceous
-  tau_acclim         = 30.0,
-  kc_jmax            = 0.41
+  # From Setup S6 Paredes et al 2025,
+  # https://doi.org/10.5194/gmd-18-9855-2025
+  kphio              =   0.08,
+  kphio_par_a        =  -0.001,
+  kphio_par_b        =  27.5,
+  soilm_thetastar    =  26.7,
+  soilm_betao        =   0.0,
+  beta_unitcostratio = 187.5,   # prior in S6: was 207.86
+  rd_to_vcmax        =   0.014, # value from Atkin et al. 2015 for C3 herbaceous
+  tau_acclim         =   1.0,
+  kc_jmax            =   0.58   # prior in S6: was 0.4244
 )
 
 
@@ -175,7 +174,7 @@ df_output <- df_result |> select(-site_info) |> unnest(data) |>
 # per-site csv:
 df_output |>
   group_split(sitename) %>%
-  purrr::map(.f = function(subdf){
+  purrr::map(function(subdf){
     readr::write_csv(
       x = subdf,
       file = here::here(paste0("data/rsofun_results_",first(subdf$sitename),".csv")))
